@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "115305552473",
+    "project_id": "rasatara",
+    "storage_bucket": "rasatara.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:115305552473:android:c416763fc7351a6b772f48",
+        "android_client_info": {
+          "package_name": "com.example.rasatara"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCD-HPVcjSSgzANBhkYiy1eTyRrbchwZVk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
