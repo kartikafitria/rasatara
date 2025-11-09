@@ -1,18 +1,29 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/recipe_model.dart';
 
 class ApiService {
-  final String baseUrl = 'https://mocki.io/v1/4b1d0df4-3f52-42b2-81b4-c2f70b0c2392'; // contoh mock API
+  final String baseUrl = "https://dummyjson.com/recipes";
 
-  Future<List<Recipe>> fetchRecipes() async {
+  // Ambil semua resep
+  Future<List<dynamic>> getRecipes() async {
     final response = await http.get(Uri.parse(baseUrl));
 
     if (response.statusCode == 200) {
-      final List data = jsonDecode(response.body);
-      return data.map((e) => Recipe.fromJson(e)).toList();
+      final data = json.decode(response.body);
+      return data['recipes'];
     } else {
-      throw Exception('Gagal memuat data resep');
+      throw Exception("Gagal mengambil data resep");
+    }
+  }
+
+  // Ambil detail resep berdasarkan ID
+  Future<Map<String, dynamic>> getRecipeDetail(int id) async {
+    final response = await http.get(Uri.parse("$baseUrl/$id"));
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception("Gagal mengambil detail resep");
     }
   }
 }
