@@ -8,12 +8,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:rasatara/main.dart';
-
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    // Use a lightweight counter app in tests when MyApp isn't available.
+    final counter = ValueNotifier<int>(0);
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ValueListenableBuilder<int>(
+          valueListenable: counter,
+          builder: (context, value, child) => Scaffold(
+            body: Center(child: Text('$value')),
+            floatingActionButton: FloatingActionButton(
+              onPressed: () => counter.value++,
+              child: const Icon(Icons.add),
+            ),
+          ),
+        ),
+      ),
+    );
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

@@ -1,32 +1,33 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class AuthService {
-  // Instance Firebase dan Google Sign In
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   // Login dengan Google
   Future<UserCredential?> signInWithGoogle() async {
     try {
-      // 1️⃣ Login ke Google
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return null; // Batal login
-
-      // 2️⃣ Ambil detail autentikasi
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
-
-      // 3️⃣ Buat credential Firebase
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      // 4️⃣ Login ke Firebase
-      return await _auth.signInWithCredential(credential);
-    } catch (e) {
+      if (kIsWeb) {
+        // Web menggunakan popup
+        GoogleAuthProvider googleProvider = GoogleAuthProvider();
+        return await _auth.signInWithPopup(googleProvider);
+      } else {
+        // Android / iOS
+        final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+        if (googleUser == null) return null; // login dibatalkan
+        final GoogleSignInAuthentication googleAuth =
+            await googleUser.authentication;
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        return await _auth.signInWithCredential(credential);
+      }
+    } catch (e, s) {
       print("❌ Error saat login Google: $e");
+      print(s);
       return null;
     }
   }
@@ -34,7 +35,9 @@ class AuthService {
   // Logout
   Future<void> signOut() async {
     await _auth.signOut();
-    await _googleSignIn.signOut();
+    if (!kIsWeb) {
+      await _googleSignIn.signOut();
+    }
   }
 
   // Dapatkan user aktif
