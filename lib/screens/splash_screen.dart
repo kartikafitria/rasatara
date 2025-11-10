@@ -20,28 +20,32 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkUserStatus() async {
-    await Future.delayed(const Duration(seconds: 2)); // splash 2 detik
+    await Future.delayed(const Duration(seconds: 2)); // waktu splash
+
     final prefs = await SharedPreferences.getInstance();
     final bool seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
     final user = FirebaseAuth.instance.currentUser;
 
+    print('DEBUG → seenOnboarding: $seenOnboarding');
+    print('DEBUG → user: ${user?.email}');
+
     if (user != null) {
-      // Sudah login → langsung ke Home
+      // ✅ Sudah login → langsung ke Home
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => HomeScreen()),
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     } else if (!seenOnboarding) {
-      // Belum pernah onboarding → tampilkan onboarding
+      // ✅ Belum pernah onboarding → tampilkan onboarding
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => OnboardingScreen()),
+        MaterialPageRoute(builder: (_) => const OnboardingScreen()),
       );
     } else {
-      // Sudah onboarding tapi belum login
+      // ✅ Sudah onboarding tapi belum login
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => LoginScreen()),
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
       );
     }
   }

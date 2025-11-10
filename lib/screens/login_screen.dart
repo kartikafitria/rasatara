@@ -1,34 +1,15 @@
 import 'package:flutter/material.dart';
-import '../../../auth_service.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
 import 'home_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final _authService = AuthService();
-
-  Future<void> _handleGoogleLogin() async {
-    final user = await _authService.signInWithGoogle();
-    if (user != null && mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => HomeScreen()),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login dibatalkan atau gagal')),
-      );
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -54,7 +35,15 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 40),
               ElevatedButton.icon(
-                onPressed: _handleGoogleLogin,
+                onPressed: () async {
+                  await authProvider.signInWithGoogle();
+                  if (authProvider.isLoggedIn && context.mounted) {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HomeScreen()),
+                    );
+                  }
+                },
                 icon: const Icon(Icons.login),
                 label: const Text('Login dengan Google'),
                 style: ElevatedButton.styleFrom(
@@ -68,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 20),
               Text(
-                FirebaseAuth.instance.currentUser?.email ?? 'Belum login',
+                authProvider.user?.email ?? 'Belum login',
                 style: const TextStyle(color: Colors.grey),
               ),
             ],

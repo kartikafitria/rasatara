@@ -16,22 +16,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final List<Map<String, String>> _onboardingPages = [
     {
       'title': 'Selamat Datang di Rasatara',
-      'description': 'Temukan resep masakan Nusantara yang lezat dan mudah dibuat.',
+      'description':
+          'Temukan resep masakan Nusantara yang lezat dan mudah dibuat.',
       'icon': '🍳',
     },
     {
       'title': 'Resep Terlengkap',
-      'description': 'Koleksi resep dari tradisional hingga modern, siap kamu coba!',
+      'description':
+          'Koleksi resep dari tradisional hingga modern, siap kamu coba!',
       'icon': '📚',
     },
     {
       'title': 'Masak dengan Mudah',
-      'description': 'Ikuti langkah demi langkah panduan memasak dari para ahli.',
+      'description':
+          'Ikuti langkah demi langkah panduan memasak dari para ahli.',
       'icon': '👨‍🍳',
     },
   ];
 
-  /// Tombol "Lanjut" atau "Mulai"
   Future<void> _onNext() async {
     if (_currentPage < _onboardingPages.length - 1) {
       _pageController.nextPage(
@@ -48,7 +50,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     }
   }
 
-  /// Tombol "Lewati"
   Future<void> _skipOnboarding() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('seenOnboarding', true);
@@ -80,10 +81,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          page['icon']!,
-                          style: const TextStyle(fontSize: 80),
-                        ),
+                        Text(page['icon']!, style: const TextStyle(fontSize: 80)),
                         const SizedBox(height: 40),
                         Text(
                           page['title']!,
@@ -97,10 +95,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         const SizedBox(height: 20),
                         Text(
                           page['description']!,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Colors.grey,
-                          ),
+                          style: const TextStyle(fontSize: 16, color: Colors.grey),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -109,8 +104,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
               ),
             ),
-
-            // Indicator + tombol bawah
             Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
