@@ -11,12 +11,32 @@ class RecipeListScreen extends StatefulWidget {
 
 class _RecipeListScreenState extends State<RecipeListScreen> {
   final ApiService apiService = ApiService();
-  late Future<List<dynamic>> _recipes;
+  late Future<List<dynamic>> _recipesFuture;
+  List<dynamic> _allRecipes = [];
+  List<dynamic> _filteredRecipes = [];
+  TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _recipes = apiService.getRecipes();
+    _recipesFuture = apiService.getRecipes();
+    _searchController.addListener(_filterRecipes);
+  }
+
+  void _filterRecipes() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredRecipes = _allRecipes
+          .where((recipe) =>
+              recipe['name'].toLowerCase().contains(query))
+          .toList();
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -27,96 +47,71 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
         backgroundColor: Colors.orange,
       ),
       body: FutureBuilder<List<dynamic>>(
-        future: _recipes,
+        future: _recipesFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text("Terjadi kesalahan: ${snapshot.error}"));
+            return Center(child: Text("Error: ${snapshot.error}"));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text("Tidak ada data resep."));
           } else {
-            final recipes = snapshot.data!;
-            return RefreshIndicator(
-              onRefresh: () async {
-                setState(() {
-                  _recipes = apiService.getRecipes();
-                });
-              },
-              child: ListView.builder(
-                padding: const EdgeInsets.all(8),
-                itemCount: recipes.length,
-                itemBuilder: (context, index) {
-                  final recipe = recipes[index];
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                    elevation: 4,
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(12),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                RecipeDetailScreen(id: recipe['id']),
-                          ),
-                        );
-                      },
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(12),
-                              bottomLeft: Radius.circular(12),
-                            ),
+            _allRecipes = snapshot.data!;
+            if (_filteredRecipes.isEmpty && _searchController.text.isEmpty) {
+              _filteredRecipes = _allRecipes;
+            }
+
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: "Cari resep makanan...",
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _filteredRecipes.length,
+                    itemBuilder: (context, index) {
+                      final recipe = _filteredRecipes[index];
+                      return Card(
+                        margin:
+                            const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        child: ListTile(
+                          leading: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
                             child: Image.network(
                               recipe['image'],
-                              width: 120,
-                              height: 100,
+                              width: 60,
+                              height: 60,
                               fit: BoxFit.cover,
                             ),
                           ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.all(12.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    recipe['name'],
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    "Waktu masak: ${recipe['cookTimeMinutes']} menit",
-                                    style:
-                                        const TextStyle(color: Colors.grey),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    recipe['mealType'][0],
-                                    style: const TextStyle(
-                                      color: Colors.deepOrange,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
+                          title: Text(recipe['name']),
+                          subtitle: Text(
+                              "Waktu masak: ${recipe['cookTimeMinutes']} menit"),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    RecipeDetailScreen(id: recipe['id']),
                               ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             );
           }
         },
