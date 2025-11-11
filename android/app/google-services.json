@@ -12,7 +12,20 @@
           "package_name": "com.example.rasatara"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "115305552473-4untcu4dvp35dp46mjte1t906dcbms3j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rasatara",
+            "certificate_hash": "8709fb0a11caaf11a0496692289753c127bf6f0c"
+          }
+        },
+        {
+          "client_id": "115305552473-uh5mjk2u319vnlofdoc8b5rck5iqq986.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCD-HPVcjSSgzANBhkYiy1eTyRrbchwZVk"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "115305552473-uh5mjk2u319vnlofdoc8b5rck5iqq986.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "115305552473-3gc7pbr55qho42999en28iesue77fuhl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.rasatara"
+              }
+            }
+          ]
         }
       }
     }

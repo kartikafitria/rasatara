@@ -43,6 +43,7 @@ dependencies:
   firebase_auth: ^5.3.1
   google_sign_in: ^6.2.1
   firebase_messaging: ^15.1.1
+  
 
   # Untuk notifikasi lokal (menampilkan notifikasi saat app terbuka)
   flutter_local_notifications: ^17.2.0

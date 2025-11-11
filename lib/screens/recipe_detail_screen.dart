@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
-  final int id;
+  final String id; // ✅ ubah ke String agar cocok dengan API
   const RecipeDetailScreen({Key? key, required this.id}) : super(key: key);
 
   @override
@@ -37,30 +37,37 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
             return const Center(child: Text("Data tidak ditemukan."));
           } else {
             final recipe = snapshot.data!;
+
             return SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Image.network(
-                    recipe['image'],
-                    width: double.infinity,
-                    height: 250,
-                    fit: BoxFit.cover,
-                  ),
+                  // 🖼️ Gambar resep
+                  if (recipe['image'] != null && recipe['image'].toString().isNotEmpty)
+                    Image.network(
+                      recipe['image'],
+                      width: double.infinity,
+                      height: 250,
+                      fit: BoxFit.cover,
+                    ),
+
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // 🧾 Nama resep
                         Text(
-                          recipe['name'],
+                          recipe['name'] ?? 'Nama Resep Tidak Ditemukan',
                           style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
                           ),
                         ),
+
                         const SizedBox(height: 8),
+
                         Row(
                           children: [
                             const Icon(Icons.timer, color: Colors.deepOrange),
@@ -68,7 +75,10 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                             Text("${recipe['cookTimeMinutes']} menit"),
                           ],
                         ),
-                        const SizedBox(height: 16),
+
+                        const SizedBox(height: 20),
+
+                        // 🍅 Daftar bahan
                         const Text(
                           "Bahan-bahan",
                           style: TextStyle(
@@ -76,12 +86,19 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
+
                         ...List.generate(
-                          recipe['ingredients'].length,
-                          (i) => Text("• ${recipe['ingredients'][i]}"),
+                          (recipe['ingredients'] as List).length,
+                          (i) => Padding(
+                            padding: const EdgeInsets.only(bottom: 4),
+                            child: Text("• ${recipe['ingredients'][i]}"),
+                          ),
                         ),
-                        const SizedBox(height: 16),
+
+                        const SizedBox(height: 20),
+
+                        // 🔪 Langkah memasak
                         const Text(
                           "Langkah-langkah",
                           style: TextStyle(
@@ -89,11 +106,12 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 8),
+
                         ...List.generate(
-                          recipe['instructions'].length,
+                          (recipe['instructions'] as List).length,
                           (i) => Padding(
-                            padding: const EdgeInsets.only(bottom: 4),
+                            padding: const EdgeInsets.only(bottom: 8),
                             child: Text("${i + 1}. ${recipe['instructions'][i]}"),
                           ),
                         ),
