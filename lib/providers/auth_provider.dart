@@ -18,6 +18,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // 🔹 LOGIN DENGAN GOOGLE
   Future<void> signInWithGoogle() async {
     final result = await _authService.signInWithGoogle();
     if (result != null) {
@@ -26,6 +27,33 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // 🔹 LOGIN DENGAN EMAIL & PASSWORD
+  Future<void> signInWithEmail(String email, String password) async {
+    try {
+      final result = await _authService.signInWithEmailPassword(email, password);
+      if (result != null) {
+        _user = result.user;
+        notifyListeners();
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  // 🔹 REGISTER DENGAN EMAIL & PASSWORD
+  Future<void> register(String email, String password) async {
+    try {
+      final result = await _authService.registerWithEmailPassword(email, password);
+      if (result != null) {
+        _user = result.user;
+        notifyListeners();
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  // 🔹 LOGOUT
   Future<void> signOut() async {
     await _authService.signOut();
     _user = null;

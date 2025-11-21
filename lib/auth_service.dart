@@ -6,7 +6,6 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-  // Login dengan Google
   Future<UserCredential?> signInWithGoogle() async {
     try {
       if (kIsWeb) {
@@ -14,7 +13,7 @@ class AuthService {
         return await _auth.signInWithPopup(googleProvider);
       } else {
         final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-        if (googleUser == null) return null; // login dibatalkan
+        if (googleUser == null) return null;
         final GoogleSignInAuthentication googleAuth =
             await googleUser.authentication;
         final credential = GoogleAuthProvider.credential(
@@ -23,21 +22,40 @@ class AuthService {
         );
         return await _auth.signInWithCredential(credential);
       }
-    } catch (e, s) {
-      print("❌ Error saat login Google: $e");
-      print(s);
+    } catch (e) {
+      print("❌ Error login Google: $e");
       return null;
     }
   }
 
-  // Logout
-  Future<void> signOut() async {
-    await _auth.signOut();
-    if (!kIsWeb) {
-      await _googleSignIn.signOut();
+  Future<UserCredential?> signInWithEmailPassword(
+      String email, String password) async {
+    try {
+      return await _auth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password.trim(),
+      );
+    } on FirebaseAuthException catch (e) {
+      throw e.message ?? 'Gagal login';
     }
   }
 
-  // Dapatkan user aktif
+  Future<UserCredential?> registerWithEmailPassword(
+      String email, String password) async {
+    try {
+      return await _auth.createUserWithEmailAndPassword(
+        email: email.trim(),
+        password: password.trim(),
+      );
+    } on FirebaseAuthException catch (e) {
+      throw e.message ?? 'Gagal mendaftar';
+    }
+  }
+
+  Future<void> signOut() async {
+    await _auth.signOut();
+    if (!kIsWeb) await _googleSignIn.signOut();
+  }
+
   User? get currentUser => _auth.currentUser;
 }

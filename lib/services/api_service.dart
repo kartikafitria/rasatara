@@ -3,26 +3,30 @@ import 'package:dio/dio.dart';
 class ApiService {
   final Dio _dio = Dio();
 
-  // ✅ Ambil semua resep
   Future<List<dynamic>> getRecipes() async {
-    final response = await _dio.get(
-      'https://www.themealdb.com/api/json/v1/1/search.php?s=',
-    );
+    try {
+      final response = await _dio.get(
+        'https://www.themealdb.com/api/json/v1/1/search.php?s=',
+      );
 
-    final data = response.data['meals'];
-    if (data == null) return [];
+      final data = response.data['meals'];
+      if (data == null) return [];
 
-    return data.map((meal) {
-      return {
-        'id': meal['idMeal'],
-        'name': meal['strMeal'],
-        'image': meal['strMealThumb'],
-        'cookTimeMinutes': 20, // Placeholder karena API tidak menyediakan waktu masak
-      };
-    }).toList();
+      return data.map((meal) {
+        return {
+          'id': meal['idMeal'] ?? '',
+          'name': meal['strMeal'] ?? 'Resep tanpa nama',
+          'image': meal['strMealThumb'] ??
+              'https://via.placeholder.com/150?text=No+Image',
+          'cookTimeMinutes': 20, 
+        };
+      }).toList();
+    } catch (e) {
+      print('❌ Error getRecipes: $e');
+      return [];
+    }
   }
 
-  // ✅ Ambil resep berdasarkan kategori (misal: Snack, Dessert, dll)
   Future<List<dynamic>> getRecipesByCategory(String category) async {
     try {
       final response = await _dio.get(
@@ -33,10 +37,11 @@ class ApiService {
 
       return data.map((meal) {
         return {
-          'id': meal['idMeal'],
-          'name': meal['strMeal'],
-          'image': meal['strMealThumb'],
-          'cookTimeMinutes': 15, // Placeholder waktu
+          'id': meal['idMeal'] ?? '',
+          'name': meal['strMeal'] ?? 'Resep tanpa nama',
+          'image': meal['strMealThumb'] ??
+              'https://via.placeholder.com/150?text=No+Image',
+          'cookTimeMinutes': 15, 
         };
       }).toList();
     } catch (e) {
@@ -45,7 +50,6 @@ class ApiService {
     }
   }
 
-  // ✅ Ambil detail resep berdasarkan ID
   Future<Map<String, dynamic>> getRecipeDetail(String id) async {
     try {
       final response = await _dio.get(
@@ -59,7 +63,6 @@ class ApiService {
 
       final meal = meals[0];
 
-      // Ambil daftar bahan dan takaran
       final List<String> ingredients = [];
       for (var i = 1; i <= 20; i++) {
         final ing = meal['strIngredient$i'];
@@ -72,7 +75,6 @@ class ApiService {
         }
       }
 
-      // Pisahkan langkah instruksi berdasarkan baris
       final instructionsRaw = meal['strInstructions'] ?? '';
       final instructions = instructionsRaw
           .toString()
@@ -82,15 +84,16 @@ class ApiService {
           .toList();
 
       return {
-        'id': meal['idMeal'],
-        'name': meal['strMeal'],
-        'image': meal['strMealThumb'],
+        'id': meal['idMeal'] ?? '',
+        'name': meal['strMeal'] ?? 'Resep tanpa nama',
+        'image': meal['strMealThumb'] ??
+            'https://via.placeholder.com/150?text=No+Image',
         'cookTimeMinutes': 20,
         'ingredients': ingredients,
         'instructions': instructions,
       };
     } catch (e) {
-      print('❌ Error getRecipeDetail: $e');
+      print(' Error getRecipeDetail: $e');
       rethrow;
     }
   }

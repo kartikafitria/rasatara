@@ -12,37 +12,51 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+
   @override
   void initState() {
     super.initState();
+
+  
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    );
+    _fadeAnimation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeIn,
+    );
+
+    _controller.forward();
+
     _checkUserStatus();
   }
 
   Future<void> _checkUserStatus() async {
-    await Future.delayed(const Duration(seconds: 2)); // waktu splash
+    await Future.delayed(const Duration(seconds: 3)); // splash screen
 
     final prefs = await SharedPreferences.getInstance();
     final bool seenOnboarding = prefs.getBool('seenOnboarding') ?? false;
     final user = FirebaseAuth.instance.currentUser;
 
-    print('DEBUG → seenOnboarding: $seenOnboarding');
-    print('DEBUG → user: ${user?.email}');
-
     if (user != null) {
-      // ✅ Sudah login → langsung ke Home
+      // Sudah login -> langsung ke Home
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     } else if (!seenOnboarding) {
-      // ✅ Belum pernah onboarding → tampilkan onboarding
+      // Belum pernah onboarding -> tampilkan onboarding
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const OnboardingScreen()),
       );
     } else {
-      // ✅ Sudah onboarding tapi belum login
+      // Sudah onboarding tapi belum login
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -51,25 +65,23 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.orange,
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Icon(Icons.restaurant_menu, size: 100, color: Colors.white),
-            SizedBox(height: 20),
-            Text(
-              'Rasatara',
-              style: TextStyle(
-                fontSize: 32,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 2,
-              ),
-            ),
-          ],
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Image.asset(
+            'assets/images/logo_rasatara.png',
+            width: 150,
+            height: 150,
+          ),
         ),
       ),
     );

@@ -20,7 +20,13 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
   @override
   void initState() {
     super.initState();
-    _recipesFuture = apiService.getRecipes();
+
+    if (widget.category != null) {
+      _recipesFuture = apiService.getRecipesByCategory(widget.category!);
+    } else {
+      _recipesFuture = apiService.getRecipes();
+    }
+
     _searchController.addListener(_filterRecipes);
   }
 
@@ -37,17 +43,6 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
-  }
-
-  List<dynamic> _filterByCategory(List<dynamic> recipes) {
-    if (widget.category == null) return recipes;
-    final category = widget.category!.toLowerCase();
-
-    return recipes.where((recipe) {
-      final name = recipe['name'].toLowerCase();
-      return name.contains(category) ||
-          recipe['mealType'].toString().toLowerCase().contains(category);
-    }).toList();
   }
 
   @override
@@ -69,14 +64,13 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text("Tidak ada data resep."));
           } else {
-            _allRecipes = _filterByCategory(snapshot.data!);
+            _allRecipes = snapshot.data!;
             if (_filteredRecipes.isEmpty && _searchController.text.isEmpty) {
               _filteredRecipes = _allRecipes;
             }
 
             return Column(
               children: [
-                // 🔍 Search bar
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextField(
@@ -91,7 +85,6 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
                   ),
                 ),
 
-                // 📋 List resep
                 Expanded(
                   child: ListView.builder(
                     itemCount: _filteredRecipes.length,
@@ -99,8 +92,8 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
                       final recipe = _filteredRecipes[index];
                       return Card(
                         elevation: 2,
-                        margin:
-                            const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 6),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -122,10 +115,6 @@ class _RecipeListScreenState extends State<RecipeListScreen> {
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
                             ),
-                          ),
-                          subtitle: Text(
-                            "Durasi memasak: ${recipe['cookTimeMinutes']} menit",
-                            style: const TextStyle(color: Colors.grey),
                           ),
                           trailing: const Icon(
                             Icons.arrow_forward_ios,

@@ -22,18 +22,16 @@ class _HomeScreenState extends State<HomeScreen> {
     _generateRandomTip();
   }
 
-  // 🔧 Inisialisasi Firebase Messaging
   Future<void> _initializeFCM() async {
     try {
       await FirebaseMessaging.instance.requestPermission();
       final token = await FirebaseMessaging.instance.getToken();
-      print('✅ FCM aktif (token disembunyikan): $token');
+      print(' FCM aktif (token disembunyikan): $token');
     } catch (e) {
-      print('❌ Gagal inisialisasi FCM: $e');
+      print(' Gagal inisialisasi FCM: $e');
     }
   }
 
-  // 🎲 Pilih tips acak tiap buka app
   void _generateRandomTip() {
     final tips = [
       "Gunakan minyak zaitun untuk menumis agar lebih sehat 🌿",
@@ -41,15 +39,10 @@ class _HomeScreenState extends State<HomeScreen> {
       "Gunakan air jeruk nipis untuk menghilangkan bau amis ikan 🐟",
       "Cuci beras dengan air dingin agar nasi lebih pulen 🍚",
       "Simpan rempah di tempat gelap agar aroma tidak cepat hilang 🌶️",
-      "Gunakan api kecil saat memasak saus supaya tidak gosong 🍲",
-      "Gunakan sendok kayu agar wajan tidak tergores 🥄",
-      "Masukkan garam di akhir memasak sup agar rasa lebih segar 🧂",
-      "Tutup panci saat mendidihkan air agar lebih cepat panas 💨",
     ];
     _dailyTip = tips[Random().nextInt(tips.length)];
   }
 
-  // 🔒 Logout
   Future<void> _logout(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
@@ -67,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // 📚 Navigasi ke halaman resep berdasarkan kategori
   void _openCategory(String category) {
     Navigator.push(
       context,
@@ -89,7 +81,6 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () => _logout(context),
-            tooltip: 'Logout',
           ),
         ],
       ),
@@ -98,15 +89,13 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 👤 Profil pengguna
-            if (user != null) ...[
+            if (user != null)
               Row(
                 children: [
                   CircleAvatar(
                     radius: 35,
-                    backgroundImage: user.photoURL != null
-                        ? NetworkImage(user.photoURL!)
-                        : null,
+                    backgroundImage:
+                        user.photoURL != null ? NetworkImage(user.photoURL!) : null,
                     child: user.photoURL == null
                         ? const Icon(Icons.person, size: 35)
                         : null,
@@ -123,40 +112,22 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 25),
-            ],
+            const SizedBox(height: 25),
 
-            // 🥘 Banner sambutan
             Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(18),
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.orange.shade100,
                 borderRadius: BorderRadius.circular(15),
               ),
-              child: const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Selamat datang di Rasatara! 🍲",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepOrange,
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    "Temukan resep lezat dan inspirasi memasak setiap hari!",
-                    style: TextStyle(fontSize: 14, color: Colors.black54),
-                  ),
-                ],
+              child: const Text(
+                "Selamat datang di Rasatara! 🍲\nTemukan resep lezat setiap hari!",
+                style: TextStyle(fontSize: 16, color: Colors.deepOrange),
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 25),
 
-            // 🔥 Kategori populer (klikable)
             const Text(
               "Kategori Populer 🍛",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -199,7 +170,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 30),
 
-            // 🍳 Tombol ke daftar resep semua kategori
             Center(
               child: ElevatedButton.icon(
                 icon: const Icon(Icons.restaurant_menu),
@@ -207,10 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 30,
-                    vertical: 14,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -228,25 +195,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 35),
 
-            // 💡 Tips harian
+            
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.green.shade50,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.green.shade200),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.lightbulb, color: Colors.green, size: 28),
+                  const Icon(Icons.lightbulb, color: Colors.green),
                   const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      _dailyTip,
-                      style: const TextStyle(fontSize: 13),
-                    ),
-                  ),
+                  Expanded(child: Text(_dailyTip)),
                 ],
               ),
             ),
@@ -257,7 +218,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-// 🎨 Widget kategori yang bisa diklik
 class _CategoryCard extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -287,10 +247,8 @@ class _CategoryCard extends StatelessWidget {
           children: [
             Icon(icon, color: Colors.deepOrange, size: 30),
             const SizedBox(height: 6),
-            Text(
-              label,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-            ),
+            Text(label,
+                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
           ],
         ),
       ),

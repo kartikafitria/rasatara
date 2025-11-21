@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 
 class RecipeDetailScreen extends StatefulWidget {
-  final String id; // ✅ ubah ke String agar cocok dengan API
+  final String id; 
   const RecipeDetailScreen({Key? key, required this.id}) : super(key: key);
 
   @override
@@ -42,7 +42,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // 🖼️ Gambar resep
                   if (recipe['image'] != null && recipe['image'].toString().isNotEmpty)
                     Image.network(
                       recipe['image'],
@@ -56,7 +55,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 🧾 Nama resep
                         Text(
                           recipe['name'] ?? 'Nama Resep Tidak Ditemukan',
                           style: const TextStyle(
@@ -78,7 +76,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 
                         const SizedBox(height: 20),
 
-                        // 🍅 Daftar bahan
                         const Text(
                           "Bahan-bahan",
                           style: TextStyle(
@@ -98,7 +95,6 @@ class _RecipeDetailScreenState extends State<RecipeDetailScreen> {
 
                         const SizedBox(height: 20),
 
-                        // 🔪 Langkah memasak
                         const Text(
                           "Langkah-langkah",
                           style: TextStyle(

@@ -34,14 +34,12 @@ class NotificationService {
       onDidReceiveNotificationResponse: _onNotificationTapped,
     );
 
-    // Create notification channel
     await _localNotifications
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(_channel);
   }
 
-  // Request permission
   Future<bool> requestPermission() async {
     final messaging = FirebaseMessaging.instance;
 
@@ -57,39 +55,35 @@ class NotificationService {
     return settings.authorizationStatus == AuthorizationStatus.authorized;
   }
 
-  // Get FCM token
   Future<String?> getFCMToken() async {
     try {
       final token = await FirebaseMessaging.instance.getToken();
-      print('🔑 FCM Token: $token');
+      print('FCM Token: $token');
       return token;
     } catch (e) {
-      print('❌ Error getting FCM token: $e');
+      print('Error getting FCM token: $e');
       return null;
     }
   }
 
-  // Subscribe to topic
   Future<void> subscribeToTopic(String topic) async {
     try {
       await FirebaseMessaging.instance.subscribeToTopic(topic);
-      print('✅ Subscribed to topic: $topic');
+      print(' Subscribed to topic: $topic');
     } catch (e) {
-      print('❌ Error subscribing to topic: $e');
+      print(' Error subscribing to topic: $e');
     }
   }
 
-  // Unsubscribe from topic
   Future<void> unsubscribeFromTopic(String topic) async {
     try {
       await FirebaseMessaging.instance.unsubscribeFromTopic(topic);
-      print('✅ Unsubscribed from topic: $topic');
+      print(' Unsubscribed from topic: $topic');
     } catch (e) {
-      print('❌ Error unsubscribing from topic: $e');
+      print(' Error unsubscribing from topic: $e');
     }
   }
 
-  // Show local notification
   Future<void> showNotification({
     required int id,
     required String title,
@@ -116,27 +110,22 @@ class NotificationService {
         ),
         payload: payload,
       );
-      print('✅ Local notification shown');
+      print(' Local notification shown');
     } catch (e) {
-      print('❌ Error showing notification: $e');
+      print(' Error showing notification: $e');
     }
   }
 
-  // Handle notification tap
   void _onNotificationTapped(NotificationResponse response) {
     print('🔔 Notification tapped with payload: ${response.payload}');
     
-    // TODO: Handle navigation based on payload
-    // Anda bisa menggunakan Navigator dengan GlobalKey atau
-    // state management untuk handle navigation
+ 
   }
 
-  // Setup FCM listeners
   void setupFCMListeners({
     required Function(RemoteMessage) onMessageReceived,
     required Function(RemoteMessage) onMessageOpened,
   }) {
-    // Foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print('📱 Message received in foreground');
       print('Title: ${message.notification?.title}');
@@ -144,7 +133,6 @@ class NotificationService {
       
       onMessageReceived(message);
       
-      // Auto show local notification
       if (message.notification != null) {
         showNotification(
           id: message.notification.hashCode,
@@ -155,14 +143,12 @@ class NotificationService {
       }
     });
 
-    // Background/terminated -> opened
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('🔔 Message opened from background/terminated');
+      print(' Message opened from background/terminated');
       onMessageOpened(message);
     });
   }
 
-  // Check initial message (when app opened from terminated state)
   Future<RemoteMessage?> getInitialMessage() async {
     return await FirebaseMessaging.instance.getInitialMessage();
   }
